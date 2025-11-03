@@ -137,7 +137,6 @@ class CodeWizardApp:
         for i in [3, 6]:
             root.rowconfigure(i, weight=1)
         root.columnconfigure(0, weight=1)
-
     # ------------------- Backend Logic -------------------
     def call_backend(self, mode):
         threading.Thread(target=self._call_backend_thread, args=(mode,), daemon=True).start()
@@ -155,13 +154,13 @@ class CodeWizardApp:
         try:
             prompt = ""
             if mode == "run":
-                prompt = f"Simulate running this code (auto-detect language) and show only the output:\n\n{code}"
+                prompt = f"Simulate running this code (auto-detect language) and show only the output or if it is asking input or to run gui code if correct  execpt its logic then make a file on that pc desktop and tell the user to run if he had that programming language installed in the user's desktop otherwise tell its error   :\n\n{code}"
             elif mode == "convert":
                 syntax_prompt = f"Detect language automatically. Check this code for syntax errors only. Reply 'OK' if correct, otherwise list the errors:\n\n{code}"
                 syntax_resp = client.chat.completions.create(
                     model="gpt-4o-mini",
                     messages=[
-                        {"role": "system", "content": "You are a syntax checker."},
+                        {"role": "system", "content": "You are a syntax checker and if the error is logical or no error then give only that the code has no errors with converted targeted coding language.:\n\n{code}"},
                         {"role": "user", "content": syntax_prompt},
                     ],
                 )
@@ -172,7 +171,7 @@ class CodeWizardApp:
                     return
                 prompt = f"Detect language automatically and convert this code to {target_lang}:\n\n{code}"
             elif mode == "fix":
-                prompt = f"Detect language automatically and fix syntax errors in this code:\n\n{code}"
+                prompt = f"Detect language automatically and fix syntax errors if the code have erros execpt logical errors otherwise throw that the code has no errors in this code:\n\n{code}"
             else:
                 messagebox.showerror("Error", "Invalid mode")
                 self.status_label.config(text="")
@@ -202,3 +201,4 @@ if __name__ == "__main__":
 
 #this code works i think execept taking input if code takes input and i think gui
     root.mainloop() 
+
