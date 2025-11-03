@@ -10,7 +10,7 @@ client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 #client = openai.OpenAI(api_key="")  # Replace with your key
 
 # ------------------- Main App -------------------
-class CodeWizardApp:
+"""class CodeWizardApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Code Wizard")
@@ -61,7 +61,82 @@ class CodeWizardApp:
         self.output_text.grid(row=6, column=0, sticky="nsew", padx=10, pady=5)
 
         # Make output text expandable
-        root.rowconfigure(6, weight=2)
+        root.rowconfigure(6, weight=2)"""
+
+class CodeWizardApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("✨ Code Wizard")
+        self.root.geometry("950x750")
+        self.root.configure(bg="#121212")
+
+        # --- Custom Theme Setup ---
+        style = ttk.Style()
+        style.theme_use("clam")
+        style.configure(
+            "TLabel",
+            background="#121212",
+            foreground="#ffffff",
+            font=("Segoe UI", 11)
+        )
+        style.configure(
+            "TButton",
+            font=("Segoe UI", 11, "bold"),
+            padding=6
+        )
+        style.map(
+            "TButton",
+            background=[("active", "#6c63ff")],
+            foreground=[("active", "#ffffff")]
+        )
+
+        # --- Target Language Selection ---
+        ttk.Label(root, text="🎯 Target Language:").grid(row=0, column=0, sticky="w", padx=12, pady=(15, 5))
+
+        self.languages = ["Python", "JavaScript", "C++", "Java", "Go"]
+        self.target_lang = tk.StringVar(value="JavaScript")
+
+        lang_frame = tk.Frame(root, bg="#121212")
+        lang_frame.grid(row=1, column=0, sticky="w", padx=12, pady=5)
+        for lang in self.languages:
+            ttk.Radiobutton(lang_frame, text=lang, value=lang, variable=self.target_lang).pack(side="left", padx=5)
+
+        # --- Input Code Section ---
+        ttk.Label(root, text="🧩 Input Code:").grid(row=2, column=0, sticky="w", padx=12, pady=(10, 2))
+        self.input_text = scrolledtext.ScrolledText(
+            root, bg="#1e1e1e", fg="#dcdcdc",
+            insertbackground="#ffffff", font=("Consolas", 12),
+            wrap=tk.WORD
+        )
+        self.input_text.insert("1.0", "# Paste your code here...")
+        self.input_text.grid(row=3, column=0, sticky="nsew", padx=12, pady=5)
+
+        # --- Buttons ---
+        button_frame = tk.Frame(root, bg="#121212")
+        button_frame.grid(row=4, column=0, sticky="ew", padx=12, pady=10)
+        button_frame.columnconfigure((0, 1, 2), weight=1)
+
+        ttk.Button(button_frame, text="🪄 Convert", command=lambda: self.call_backend("convert")).grid(row=0, column=0, sticky="ew", padx=5)
+        ttk.Button(button_frame, text="🩺 Fix", command=lambda: self.call_backend("fix")).grid(row=0, column=1, sticky="ew", padx=5)
+        ttk.Button(button_frame, text="▶️ Run", command=lambda: self.call_backend("run")).grid(row=0, column=2, sticky="ew", padx=5)
+
+        # --- Status Label ---
+        self.status_label = ttk.Label(button_frame, text="", foreground="#ccc", background="#121212", font=("Segoe UI", 10))
+        self.status_label.grid(row=1, column=0, columnspan=3, pady=(6, 0))
+
+        # --- Output Code Section ---
+        ttk.Label(root, text="📤 Output:").grid(row=5, column=0, sticky="w", padx=12, pady=(10, 2))
+        self.output_text = scrolledtext.ScrolledText(
+            root, bg="#1e1e1e", fg="#dcdcdc",
+            font=("Consolas", 12), wrap=tk.WORD
+        )
+        self.output_text.insert("1.0", "# Output will appear here...")
+        self.output_text.grid(row=6, column=0, sticky="nsew", padx=12, pady=5)
+
+        # --- Responsive Layout ---
+        for i in [3, 6]:
+            root.rowconfigure(i, weight=1)
+        root.columnconfigure(0, weight=1)
 
     # ------------------- Backend Logic -------------------
     def call_backend(self, mode):
